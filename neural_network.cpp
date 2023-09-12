@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
+#include<time.h>
 #define Nin 2
 #define Nout 1
 #define Nneuron 2
