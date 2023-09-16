@@ -162,7 +162,7 @@ int main(void)
 					{				
 						for(size_t x = 0; x < width; x++)
 							{
-								pixels[j++]=out[y][x];
+								pixels[(j++)+(640-width)/2]=out[y][x];
 							}
 					}
 		SDL_UnlockTexture(texture);
