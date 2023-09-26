@@ -7,6 +7,7 @@
 #define Nneuron 3
 #define Nlayer 2 //Number of a hiden layer
 #define SEED   10
+#define lr 0.1
 
 typedef struct NN
 {
@@ -138,7 +139,7 @@ void forward(NN *nn)   //done
 
 }
  
-#define lr 0.1
+
 
 void back(NN *nn)
 {
@@ -304,4 +305,3 @@ float input[][3]={  {1.0f,1.0f,1.0f},
     }
     return 0;
 }
-
