@@ -35,7 +35,7 @@ void randomnn(uint32_t weights[height][width])
 	
 }
 
-void nn(uint32_t image[height][width],uint32_t weights[height][width],uint32_t out[height][width])
+void nn(uint32_t image[height][width],uint32_t weights[height][width],uint32_t out[height][width])  //SINGLE LAYER PERCEPTRON
 {
 	//forward
 	
