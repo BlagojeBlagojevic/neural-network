@@ -4,16 +4,17 @@
 #include<time.h>
 #define Nin 2
 #define Nout 1
-#define Nneuron 2
-#define SEED   10
+#define Nneuron 5
+#define lr 0.02
+#define SEED   32
 typedef struct NN
 {
 
     float weightso[Nneuron*Nout];
     float weightsi[Nneuron*Nin];
     float neuron[Nneuron];   //Midle storage  
-    float biasi[Nneuron*Nin];
-    float biaso[Nneuron*Nout];
+    float biasi;
+    float biaso;
     float input[Nin];
     float out[Nout];
     float corect[Nout];
@@ -33,8 +34,8 @@ float RandF(void)
 
 void init(NN *nn)
 {
-    srand(time(0));
-
+    	//srand(time(0));
+	  	  srand(32);
     for (size_t i = 0; i < Nin; i++)
         nn->input[i]=0.0f;
 
@@ -50,11 +51,8 @@ void init(NN *nn)
     for (size_t i = 0; i < Nin*Nneuron; i++)
         nn->weightso[i]=RandF();
 
-    for (size_t i = 0; i < Nneuron; i++)
-        nn->biasi[i]=0;
-
-    for (size_t i = 0; i < Nneuron; i++)
-        nn->biaso[i]=0;
+        nn->biasi=0.0f;
+        nn->biaso=0.0f;
 
     for (size_t i = 0; i < Nneuron; i++)
         nn->neuron[i]=0.0f;
@@ -64,7 +62,7 @@ void init(NN *nn)
 float activation(float x)
 {
     //return x;
-    //return 1.0f/(1.0f+exp(-1.0*x));
+    return 1.0f/(1.0f+exp(-1.0*x));
     return tanhf(x);
     //return sin(x);
     //return fabsf(x);
@@ -80,7 +78,7 @@ void forward(NN *nn)   //done
         for (j = 0; j < Nin ; j++)  // od prijasnjeg
         nn->neuron[i]+=(nn->weightsi[j+prescaler]*nn->input[j]);
         //nn->neuron[i]+=nn->biasi[i];
-        nn->neuron[i]=activation(nn->neuron[i]);
+        nn->neuron[i]=activation(nn->neuron[i]+nn->biasi);
         prescaler+=j;
         //printf("in %d\n",prescaler);
 
@@ -93,14 +91,14 @@ void forward(NN *nn)   //done
         for (j = 0; j < Nneuron ; j++)  // od prijasnjeg
             nn->out[i]+=(nn->weightso[j+prescaler]*nn->neuron[j]);
         //nn->out[i]+=nn->biaso[i];
-        nn->out[i]=activation(nn->out[i]);
+        nn->out[i]=activation(nn->out[i]+nn->biaso);
         prescaler+=j;
         //printf("out %d\n",prescaler);
     }
 
 }
  
-#define lr 1
+
 
 void back(NN *nn)
 {
@@ -114,9 +112,9 @@ void back(NN *nn)
               const float derror=nn->out[j]-nn->corect[j];
               const float dsigmoid=nn->out[j]*(1.0f-nn->out[j]); 
               sum+=lr*derror*dsigmoid*nn->weightso[j+prescaler_in];
-              sumb+=lr*derror*dsigmoid*nn->biaso[j+prescaler_in];
+              sumb+=lr*derror*dsigmoid*nn->biaso;
               nn->weightso[j+prescaler_in]-=lr*derror*dsigmoid*nn->neuron[i];
-              //nn->biaso[j+prescaler_in]-=lr*derror*dsigmoid*nn->neuron[i];
+              nn->biaso-=lr*derror*dsigmoid*nn->neuron[i];
 
           }
           size_t k = 0;
@@ -124,7 +122,7 @@ void back(NN *nn)
           {
             const float hv=nn->neuron[i]*(1.0f-nn->neuron[i]);
              nn->weightsi[k+prescaler_out]-=lr*sum*hv*nn->input[k];
-             //nn->biaso[j+prescaler_out]-=lr*sumb*hv*nn->input[k];
+             nn->biasi-=lr*sumb*hv*nn->input[k];
           }
           prescaler_in+=j;
           prescaler_out+=k;       
@@ -143,8 +141,7 @@ void print(NN *nn)
         printf("wi %f ",nn->weightsi[i]);
     printf("\n");
 
-    for (size_t i = 0; i < Nout; i++)
-        printf("out[%d]: %f \n",i+1,nn->out[i]);
+	printf("biasi %f biaso %f\n",nn->biasi,nn->biaso);
 
 }
 
@@ -174,7 +171,7 @@ float input[][3]={  {1.0f,1.0f,1.0f},
                     {0.0f,0.0f,0.0f}
                 };  
     print(&nn);
-    for(size_t i =0; i<100000; i++)
+    for(size_t i =0; i < 400000; i++)
     {
         nn.corect[0]=input[i%4][2];
         nn.input[0]=input[i%4][0];
