@@ -5,8 +5,8 @@
 #include<time.h>
 #define Nin 784
 #define Nout 10
-#define Nneuron 50
-#define lr 1000
+#define Nneuron 100
+#define lr 1
 #define SEED   234
 
 
@@ -33,10 +33,10 @@ float RandF(void)
     //return 1;
     if(rand()%2==0)
         //return -1.0f*rand()/((float)RAND_MAX);
-    	return -1.0f*rand();
+    	return -1.0f*(rand()%255);
 	else 
         //return 1.0f*rand()/((float)RAND_MAX);
-   		return 1.0f*rand();
+   		return 1.0f*(rand()%255);
 }
 
 void init(NN *nn)
@@ -68,9 +68,9 @@ void init(NN *nn)
 
 float activation(float x)
 {
-    //return x;
+    //if(x > 0.0f) return x; else return 0;
     return 1.0f/(1.0f+exp(-1.0*x));
-    return tanhf(x);
+    //return tanhf(x);
     //return sin(x);
     //return fabsf(x);
 } 
@@ -168,7 +168,7 @@ void load_mnist(NN *nn)
 {
 	FILE *f = fopen("MNIST_test.txt","rb");
 	size_t c=0;
-	while(!feof(f)){     
+	while(!feof(f)&&(c < 1000000)){     
 		uint8_t corect=fgetc(f)-48;
 		//first char
 		for(size_t i = 0; i < 10; i++){c++;
@@ -176,9 +176,7 @@ void load_mnist(NN *nn)
 				nn->corect[i]=1.0f;
 			else
 				nn->corect[i]=0.0f;
-		}
-		//
-		
+		}	
 		int16_t j=0,corect1=0,multiplayer = 10,count = 0 ;
 		while(j < 784){
 			int16_t pixel =  fgetc(f)-48;
@@ -203,26 +201,19 @@ void load_mnist(NN *nn)
 				count = 0;
 				multiplayer=100;
 			}
-			//char pom = fgetc(f);//New line
-			forward(nn);
-        	back(nn);
-        	error = 1.0-nn->out[corect];
-        	c++;
-        	char ch='%';
-        	sumerror+=error;
-        	if(c%1000==0){
-        		printf("average corect rate: %.2f%c\n", 100.0f*((float)sumerror)/1000.0f,ch);sumerror=0;
-			}
-        	//corect=0;
-        	//system("pause");
-        	if(c==100000){
-        		fclose(f);
-        		break;
-        		
-			}
 		}
 			
-        	
+      	//char pom = fgetc(f);//New line
+			forward(nn);
+        	back(nn);
+        	error = nn->out[corect];
+        	c++;
+        	char ch='%';
+        	sumerror+=(1.0f-error);
+        	if(c%100==0){//continue;
+        		printf("average corect per 100: %.2f%c\n", 100.0f*((float)sumerror)/100.0f,ch);sumerror=0;
+			}
+			
 	 } 
 	
 }
@@ -240,7 +231,7 @@ float input[][3]={  {1.0f,1.0f,1.0f},
                 };  
     //print(&nn);
     //train_mnist(&nn);
-    for(size_t i =0; i < 1000; i++)
+    for(size_t i =0; i < 10; i++)
     {
      	load_mnist(&nn);        
         //printf("%u \n", i);
