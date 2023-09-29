@@ -7,7 +7,7 @@
 #define Nout 10
 #define Nneuron 100
 #define lr 1
-#define SEED   234
+#define SEED   32
 
 
 float error;
@@ -41,8 +41,8 @@ float RandF(void)
 
 void init(NN *nn)
 {
-    	srand(time(0));
-	  	  //srand(32);
+    	//srand(time(0));
+	  	srand(SEED);
     for (size_t i = 0; i < Nin; i++)
         nn->input[i]=0.0f;
 
