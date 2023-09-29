@@ -210,8 +210,8 @@ void load_mnist(NN *nn)
         	c++;
         	char ch='%';
         	sumerror+=(1.0f-error);
-        	if(c%100==0){//continue;
-        		printf("average corect per 100: %.2f%c\n", 100.0f*((float)sumerror)/100.0f,ch);sumerror=0;
+        	if(c%1000==0){//continue;
+        		printf("average corect per 1000: %.2f%c\n", 100.0f*((float)sumerror)/1000.0f,ch);sumerror=0;
 			}
 			
 	 } 
